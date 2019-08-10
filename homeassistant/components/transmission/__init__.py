@@ -36,6 +36,7 @@ SENSOR_TYPES = {
     "upload_speed": ["Up Speed", "MB/s"],
     "completed_torrents": ["Completed Torrents", None],
     "started_torrents": ["Started Torrents", None],
+    "port_open": ["Port Open", None],
 }
 
 DEFAULT_SCAN_INTERVAL = timedelta(seconds=120)
@@ -140,7 +141,11 @@ class TransmissionData:
         self._api = api
         self.completed_torrents = []
         self.started_torrents = []
+        self.port_open = None
         self.hass = hass
+        self.port_test_monitored = (
+            "port_open" in config[DOMAIN][CONF_MONITORED_CONDITIONS]
+        )
 
     def update(self):
         """Get the latest data from Transmission instance."""
@@ -150,6 +155,8 @@ class TransmissionData:
             self.data = self._api.session_stats()
             self.torrents = self._api.get_torrents()
             self.session = self._api.get_session()
+            if self.port_test_monitored:
+                self.port_open = self._api.port_test()
 
             self.check_completed_torrent()
             self.check_started_torrent()

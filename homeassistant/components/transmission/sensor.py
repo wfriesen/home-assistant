@@ -103,6 +103,8 @@ class TransmissionSensor(Entity):
             self._state = self._transmission_api.get_completed_torrent_count()
         elif self.type == "started_torrents":
             self._state = self._transmission_api.get_started_torrent_count()
+        elif self.type == "port_open":
+            self._state = self._transmission_api.port_open
 
         if self.type == "current_status":
             if self._data:
